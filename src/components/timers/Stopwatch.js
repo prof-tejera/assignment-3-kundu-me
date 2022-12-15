@@ -67,10 +67,12 @@ const Stopwatch = ({controls, index}) => {
       const localStorageTimerConfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
       localStorageTimerConfig[index] = {
         description: description,
-        stopwatchValue: stopwatchValue
+        stopwatchValue: stopwatchValue,
+        totalTime: stopwatchValue
       };
       localStorage.setItem('nkunduapp-timers-config', JSON.stringify(localStorageTimerConfig));
     }
+    appNotify('timervalueupdated', {index: index});
   }, [stopwatchValue, description]);
 
   useEffect(() => {
@@ -98,10 +100,11 @@ const Stopwatch = ({controls, index}) => {
         stop: stop
       };
       localStorage.setItem('nkunduapp-timers-state', JSON.stringify(localStorageTimerState));
+      appNotify('timervalueupdated', {index: index});
     }
   }
 
-  const { appControl, appTimerAction, appTimerIndex } = useContext(TimerContext);
+  const { appControl, appNotify, appTimerAction, appTimerIndex } = useContext(TimerContext);
   useEffect(() => {
     if (appTimerAction === 'Reset') {
       handleStopwatchClick({
@@ -160,7 +163,7 @@ const Stopwatch = ({controls, index}) => {
   const handleOnChangeDescription = (event) => {
     setDescription(event.target.value);
   };
-  
+
   return (
     <div>
       <div>

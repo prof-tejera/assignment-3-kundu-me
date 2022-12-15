@@ -62,10 +62,12 @@ const Countdown = ({controls, index}) => {
       const localStorageTimerConfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
       localStorageTimerConfig[index] = {
         description: description,
-        countdownValue: countdownValue
+        countdownValue: countdownValue,
+        totalTime: countdownValue
       };
       localStorage.setItem('nkunduapp-timers-config', JSON.stringify(localStorageTimerConfig));
     }
+    appNotify('timervalueupdated', {index: index});
   }, [countdownValue, description]);
 
   useEffect(() => {
@@ -95,7 +97,7 @@ const Countdown = ({controls, index}) => {
     }
   }
 
-  const { appControl, appTimerAction, appTimerIndex } = useContext(TimerContext);
+  const { appControl, appNotify, appTimerAction, appTimerIndex } = useContext(TimerContext);
   useEffect(() => {
     if (appTimerAction === 'Reset') {
       handleCountdownClick({

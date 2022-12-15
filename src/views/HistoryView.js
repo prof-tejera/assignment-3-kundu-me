@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import DocumentComponent from "../components/documentation/DocumentComponent";
+import HistoryComponent from "../components/history/HistoryComponent";
 
 import Loading from "../components/generic/Loading";
 
@@ -16,28 +16,23 @@ const Title = styled.div`
 `;
 
 /**
- * You can document your components by using the DocumentComponent component
+ * You can History your components by using the HistoryComponent component
  */
-const Documentation = () => {
+const HistoryView = () => {
   return (
     <Container>
       <div>
-        <Title>Documentation</Title>
-        <DocumentComponent
-          title="Loading spinner "
+        <Title>Workout History</Title>
+        <HistoryComponent
+          title="Workout History"
           component={<Loading />}
-          propDocs={[
-            {
-              prop: "size",
-              description: "Changes the size of the loading spinner",
-              type: "string",
-              defaultValue: "medium",
-            },
-          ]}
+          propDocs = {
+            localStorage.getItem('nkunduapp-timers-history') ? JSON.parse(localStorage.getItem('nkunduapp-timers-history')) : []
+          }
         />
       </div>
     </Container>
   );
 };
 
-export default Documentation;
+export default HistoryView;

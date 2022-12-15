@@ -11,6 +11,8 @@ export const TimerContext = createContext({});
 export const AppContext = ({children}) => {
   const [timers, setTimers] = useState([]);
 
+  const [timersTotalTime, setTimersTotalTime] = useState(0);
+
   const [timersChanged, setTimersChanged] = useState(0);
 
   const [appTimerAction, setAppTimerAction] = useState('');
@@ -28,6 +30,7 @@ export const AppContext = ({children}) => {
     if (timersReloaded) {
       localStorage.setItem('nkunduapp-timers', JSON.stringify(timers));
     }
+    appNotify('timervalueupdated', {index: -1});
   }, [timersChanged]);
 
   const getNextValidIndex = (index) => {
@@ -52,6 +55,7 @@ export const AppContext = ({children}) => {
     if (value === 'Reset') {
       setAppTimerAction(value);
     } else if (value === 'Start') {
+      appNotify('workoutstarted', {});
       setAppTimerAction(value);
       const appTimerNextIndex = getNextValidIndex(appTimerIndex);
       if (appTimerNextIndex === false) {
@@ -195,16 +199,80 @@ export const AppContext = ({children}) => {
     setTimersChanged(timersChanged + 1);
   };
 
+  const appNotify = (notificationId, options) => {
+    console.log(notificationId);
+    if (notificationId === 'timervalueupdated') {
+      let totalTime = 0;
+      let queue = timers;
+      let timerconfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      queue.forEach((timer, index) => {
+        if (timer.valid) {
+          totalTime += timerconfig[index] && timerconfig[index].totalTime ? timerconfig[index].totalTime : 0;
+        }
+      });
+      setTimersTotalTime(totalTime);
+      console.log(totalTime);
+    }
+    else if (notificationId === 'workoutstarted') {
+      let timersQueue = localStorage.getItem('nkunduapp-timers') ? JSON.parse(localStorage.getItem('nkunduapp-timers')) : [];
+      let timersconfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      let timersState = localStorage.getItem('nkunduapp-timers-state') ? JSON.parse(localStorage.getItem('nkunduapp-timers-state')) : {};
+      let timersHistory = localStorage.getItem('nkunduapp-timers-history') ? JSON.parse(localStorage.getItem('nkunduapp-timers-history')) : [];
+
+      let totalTime = 0;
+
+      timersHistory.push({
+        datetime: new Date(),
+        description: '',
+        totaltime: ''
+      });
+
+      timersQueue.forEach((timer, index) => {
+        if (timer.valid) {
+          let _totlaTime = timersconfig[index] && timersconfig[index].totalTime ? timersconfig[index].totalTime : 0;
+          totalTime += _totlaTime;
+          let description = " Title: " + timer.title + " - Description: " + (timersconfig[index] && timersconfig[index].description ? timersconfig[index].description : '~');
+          if (timer.title === 'Countdown') {
+            description += " - CountdownValue: " + (timersconfig[index] && timersconfig[index].countdownValue ? timersconfig[index].countdownValue : 0);
+          } else if (timer.title === 'Stopwatch') {
+            description += " - StopwatchValue: " + (timersconfig[index] && timersconfig[index].stopwatchValue ? timersconfig[index].stopwatchValue : 0);
+          } else if (timer.title === 'Tabata') {
+            description += " - CountdownValue: " + (timersconfig[index] && timersconfig[index].countdownValue ? timersconfig[index].countdownValue : 0);
+            description += " - RestdownValue: " + (timersconfig[index] && timersconfig[index].restdownValue ? timersconfig[index].restdownValue : 0);
+            description += " - RoundValue: " + (timersconfig[index] && timersconfig[index].roundValue ? timersconfig[index].roundValue : 0);
+          } else if (timer.title === 'XY') {
+            description += " - CountdownValue: " + (timersconfig[index] && timersconfig[index].countdownValue ? timersconfig[index].countdownValue : 0);
+            description += " - RoundValue: " + (timersconfig[index] && timersconfig[index].roundValue ? timersconfig[index].roundValue : 0);
+          }
+          timersHistory.push({
+            datetime: '',
+            description: description + " - Total Time (ms) : " + _totlaTime,
+            totaltime: ''
+          });
+        }
+      });
+
+      timersHistory.push({
+        datetime: '',
+        description: '',
+        totaltime: totalTime
+      });
+      localStorage.setItem('nkunduapp-timers-history', JSON.stringify(timersHistory));
+    }
+  };
+
   return (
       <TimerContext.Provider
         value={{
           timers,
+          timersTotalTime,
           addTimer,
           updateTimer,
           deleteTimer,
           moveTimerUp,
           moveTimerDown,
           appControl,
+          appNotify,
           appTimerAction,
           appTimerIndex
         }}

@@ -104,10 +104,12 @@ const Tabata = ({controls, index}) => {
         description: description,
         countdownValue: countdownValue,
         restdownValue: restdownValue,
-        roundValue:roundValue
+        roundValue: roundValue,
+        totalTime: (countdownValue + restdownValue) * roundValue
       };
       localStorage.setItem('nkunduapp-timers-config', JSON.stringify(localStorageTimerConfig));
     }
+    appNotify('timervalueupdated', {index: index});
   }, [description, countdownValue, restdownValue, roundValue]);
 
   useEffect(() => {
@@ -157,10 +159,11 @@ const Tabata = ({controls, index}) => {
         stop: stop
       };
       localStorage.setItem('nkunduapp-timers-state', JSON.stringify(localStorageTimerState));
+      appNotify('timervalueupdated', {index: index});
     }
   }
 
-  const { appControl, appTimerAction, appTimerIndex } = useContext(TimerContext);
+  const { appControl, appNotify, appTimerAction, appTimerIndex } = useContext(TimerContext);
   useEffect(() => {
     if (appTimerAction === 'Reset') {
       handleTabataClick({
