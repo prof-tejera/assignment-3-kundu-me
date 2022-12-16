@@ -28,7 +28,11 @@ export const AppContext = ({children}) => {
 
   useEffect(() => {
     if (timersReloaded) {
-      localStorage.setItem('nkunduapp-timers', JSON.stringify(timers));
+      //localStorage.setItem('nkunduapp-timers', JSON.stringify(timers));
+      let URLHash = decodeURI(window.location.hash.slice(1));
+      URLHash = URLHash ? (JSON.parse(URLHash)) : {};
+      URLHash.timers = timers;
+      window.location.hash = `${JSON.stringify(URLHash)}`;
     }
     appNotify('timervalueupdated', {index: -1});
   }, [timersChanged]);
@@ -95,16 +99,19 @@ export const AppContext = ({children}) => {
 
   const getComponentTimer = (index, title) => {
     const componentTimer = {
-      "Stopwatch": <Stopwatch controls={true} index={index} />,
-      "Countdown": <Countdown controls={true} index={index} />,
-      "XY": <XY controls={true} index={index} />,
-      "Tabata": <Tabata controls={true} index={index} />
+      "Stopwatch": <Stopwatch controls={true} index={index}/>,
+      "Countdown": <Countdown controls={true} index={index}/>,
+      "XY": <XY controls={true} index={index}/>,
+      "Tabata": <Tabata controls={true} index={index}/>
     };
     return componentTimer[title];
   };
 
   const reloadTimer = () => {
-    const localStorageTimers = localStorage.getItem('nkunduapp-timers') ? JSON.parse(localStorage.getItem('nkunduapp-timers')) : [];
+    //const localStorageTimers = localStorage.getItem('nkunduapp-timers') ? JSON.parse(localStorage.getItem('nkunduapp-timers')) : [];
+    let URLHash = decodeURI(window.location.hash.slice(1));
+    URLHash = URLHash ? (JSON.parse(URLHash)) : {};
+    const localStorageTimers = URLHash.timers ? URLHash.timers : [];
     console.log(localStorageTimers);
     let queue = [];
     localStorageTimers.forEach((localStorageTimer, index) => {
@@ -199,12 +206,27 @@ export const AppContext = ({children}) => {
     setTimersChanged(timersChanged + 1);
   };
 
+  const updateURLHash = (index, index2) => {
+    let URLHash = decodeURI(window.location.hash.slice(1));
+    URLHash = URLHash ? (JSON.parse(URLHash)) : {};
+    const URLHashConfig = URLHash.config ? URLHash.config : {};
+    let configIndex = URLHashConfig[index];
+    let configIndex2 = URLHashConfig[index2];
+    URLHashConfig[index] = configIndex2;
+    URLHashConfig[index2] = configIndex;
+    URLHash.config = URLHashConfig;
+    window.location.hash = `${JSON.stringify(URLHash)}`;
+  }
+
   const appNotify = (notificationId, options) => {
     console.log(notificationId);
     if (notificationId === 'timervalueupdated') {
       let totalTime = 0;
       let queue = timers;
-      let timerconfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      // let timerconfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      let URLHash = decodeURI(window.location.hash.slice(1));
+      URLHash = URLHash ? (JSON.parse(URLHash)) : {};
+      let timerconfig = URLHash.config ? URLHash.config : {};
       queue.forEach((timer, index) => {
         if (timer.valid) {
           totalTime += timerconfig[index] && timerconfig[index].totalTime ? timerconfig[index].totalTime : 0;
@@ -214,8 +236,12 @@ export const AppContext = ({children}) => {
       console.log(totalTime);
     }
     else if (notificationId === 'workoutstarted') {
-      let timersQueue = localStorage.getItem('nkunduapp-timers') ? JSON.parse(localStorage.getItem('nkunduapp-timers')) : [];
-      let timersconfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      let URLHash = decodeURI(window.location.hash.slice(1));
+      URLHash = URLHash ? (JSON.parse(URLHash)) : {};
+      let timersQueue = URLHash.timers ? URLHash.timers : [];
+      let timersconfig = URLHash.config ? URLHash.config: {};
+      // let timersQueue = localStorage.getItem('nkunduapp-timers') ? JSON.parse(localStorage.getItem('nkunduapp-timers')) : [];
+      // let timersconfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
       let timersState = localStorage.getItem('nkunduapp-timers-state') ? JSON.parse(localStorage.getItem('nkunduapp-timers-state')) : {};
       let timersHistory = localStorage.getItem('nkunduapp-timers-history') ? JSON.parse(localStorage.getItem('nkunduapp-timers-history')) : [];
 

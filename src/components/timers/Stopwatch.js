@@ -25,7 +25,10 @@ const Stopwatch = ({controls, index}) => {
   const [timersReloaded, setTimersReloaded] = useState(false);
   useEffect(() => {
     if (timersReloaded === false) {
-      const localStorageTimerConfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      //const localStorageTimerConfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      let URLHash = decodeURI(window.location.hash.slice(1));
+      URLHash = URLHash ? (JSON.parse(URLHash)) : {};
+      const localStorageTimerConfig = URLHash.config ? URLHash.config : {};
       if (localStorageTimerConfig[index]) {
         if (localStorageTimerConfig[index].description) {
           setDescription(localStorageTimerConfig[index].description);
@@ -64,13 +67,24 @@ const Stopwatch = ({controls, index}) => {
 
   useEffect(() => {
     if (timersReloaded) {
-      const localStorageTimerConfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
-      localStorageTimerConfig[index] = {
+      // const localStorageTimerConfig = localStorage.getItem('nkunduapp-timers-config') ? JSON.parse(localStorage.getItem('nkunduapp-timers-config')) : {};
+      // localStorageTimerConfig[index] = {
+      //   description: description,
+      //   stopwatchValue: stopwatchValue,
+      //   totalTime: stopwatchValue
+      // };
+      // localStorage.setItem('nkunduapp-timers-config', JSON.stringify(localStorageTimerConfig));
+      let URLHash = decodeURI(window.location.hash.slice(1));
+      URLHash = URLHash ? (JSON.parse(URLHash)) : {};
+      if (!URLHash.config) {
+        URLHash.config = {};
+      }
+      URLHash.config[index] = {
         description: description,
         stopwatchValue: stopwatchValue,
         totalTime: stopwatchValue
-      };
-      localStorage.setItem('nkunduapp-timers-config', JSON.stringify(localStorageTimerConfig));
+      }
+      window.location.hash = `${JSON.stringify(URLHash)}`;
     }
     appNotify('timervalueupdated', {index: index});
   }, [stopwatchValue, description]);
