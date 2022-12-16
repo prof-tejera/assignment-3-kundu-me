@@ -112,7 +112,6 @@ export const AppContext = ({children}) => {
     let URLHash = decodeURI(window.location.hash.slice(1));
     URLHash = URLHash ? (JSON.parse(URLHash)) : {};
     const localStorageTimers = URLHash.timers ? URLHash.timers : [];
-    console.log(localStorageTimers);
     let queue = [];
     localStorageTimers.forEach((localStorageTimer, index) => {
       queue.push({
@@ -200,8 +199,6 @@ export const AppContext = ({children}) => {
     queue[index2] = q1;
     queue[index] = q2;
 
-    console.log(queue);
-
     setTimers(queue);
     setTimersChanged(timersChanged + 1);
   };
@@ -219,7 +216,6 @@ export const AppContext = ({children}) => {
   }
 
   const appNotify = (notificationId, options) => {
-    console.log(notificationId);
     if (notificationId === 'timervalueupdated') {
       let totalTime = 0;
       let queue = timers;
@@ -233,7 +229,6 @@ export const AppContext = ({children}) => {
         }
       });
       setTimersTotalTime(totalTime);
-      console.log(totalTime);
     }
     else if (notificationId === 'workoutstarted') {
       let URLHash = decodeURI(window.location.hash.slice(1));
