@@ -1,3 +1,7 @@
+# DEMO VIDEO: https://youtu.be/0KygEwAuK7o
+
+# URL: https://kundu-me.github.io/CSCI-E39-A3
+
 # Assignment 3 (A3)
 
 Now that we have our basic workout app working (A2) we are going to build out more features. Our starting point is your A2 code, so copy it into this repo (not the `.github` folder). ***The goal is to have a production ready workout app by the end of A3.*** Some of the features below are harder to implement than others. I recommend staring with the "Persisting state" and then doing the rest in any order.
